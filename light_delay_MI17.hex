@@ -1,0 +1,43 @@
+// Pin definitions
+const int lightPin = 13;    // Light connected to pin 13
+const int switchPin = 2;    // Switch connected to pin 2
+
+// State variables
+bool pressed = false;
+bool pressUp = false;
+
+// Timing variables
+unsigned long lastChangeTime = 0; // Time of the last state change
+const unsigned long delayTime = 5000; // Delay time of 2 seconds (2000 milliseconds)
+
+void setup() {
+  // Set pin modes
+  pinMode(lightPin, OUTPUT);
+  pinMode(switchPin, INPUT_PULLUP); // Enable internal pull-up resistor
+
+  // Initialize light state
+  digitalWrite(lightPin, LOW); // Turn off the light
+}
+
+void loop() {
+  int switchState = digitalRead(switchPin); // Read the state of the switch
+
+  // When switch is pressed down and light is off
+  if (switchState == LOW && !pressed) {
+    digitalWrite(lightPin, HIGH); // Turn on the light
+    pressUp = true;
+  }
+
+  // When switch is released and light was previously on
+  if (switchState == HIGH && pressUp) {
+    digitalWrite(lightPin, LOW); // Turn off the light
+    pressed = true;
+    pressUp = false;
+    lastChangeTime = millis(); // Update the last change time
+  }
+
+  // Check if the delay time has passed since the last state change
+  if (millis() - lastChangeTime >= delayTime) {
+    pressed = false; // Reset the pressed flag after the delay time
+  }
+}
